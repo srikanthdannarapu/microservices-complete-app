@@ -1,31 +1,33 @@
 package com.controller;
 
-import java.util.Arrays;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
-import com.model.Student;
 import com.model.Students;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import com.service.StudentService;
 
 @RestController
 @RequestMapping("/student-consumer")
 public class StudentConsumerController {
 
 	@Autowired
-	private RestTemplate restTemplate;
-
+	private StudentService studentService;
+	
+	//@HystrixCommand ..enable this only if hystrix dashboard doesn't showup
 	@GetMapping("/studentsList")
 	public ResponseEntity<Students> getAllStudents() {
-		ResponseEntity<Student[]> responseEntity = restTemplate.getForEntity("http://student-crud-service/api/students",
-				Student[].class);
-		Student[] studnets = responseEntity.getBody();
-		Students stds = new Students();
-		stds.setStudents(Arrays.asList(studnets));
-		return ResponseEntity.ok(stds);
+		Students students = studentService.getAllStudents();
+		return ResponseEntity.ok(students);
+	}
+	
+	//@HystrixCommand ..enable this only if hystrix dashboard doesn't showup
+	@GetMapping("/allStudents")
+	public ResponseEntity<Students> getStudents() {
+		Students students = studentService.getStudents();
+		return ResponseEntity.ok(students);
 	}
 }
