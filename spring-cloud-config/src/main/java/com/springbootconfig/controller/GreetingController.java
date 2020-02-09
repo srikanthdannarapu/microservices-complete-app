@@ -5,12 +5,15 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.configmodel.DbSettings;
 
 @RestController
+@RefreshScope
 public class GreetingController {
 	
 	@Value("${my.greeting}")
@@ -28,11 +31,14 @@ public class GreetingController {
 	@Value("${my.list.values}")
 	private List<String> listValues;
 	
-	@Value("#{${db.connection}}")
-	private Map<String, String> dbValues;
+	//@Value("#{${db.connectionDetails}}")
+	//private Map<String, String> dbValues;
 	
 	@Autowired
 	private DbSettings dbSettings;
+	
+	@Autowired
+	private Environment environment;
 	
 	public GreetingController() {
 		// TODO Auto-generated constructor stub
@@ -42,7 +48,11 @@ public class GreetingController {
 	@GetMapping("/greeting")
 	public String greeting() {
 		return greetingMessage + " :" + description + ": " + staticMessage + " :" + defaultGreeting + " :" + listValues
-				+ " :" + dbValues + " : " +dbSettings.getConnection() + dbSettings.getHost() ;
-
+				 + " : " +dbSettings.getConnection() + dbSettings.getHost() ;
+	}
+	
+	@GetMapping("/getEnv")
+	public String envDetails() {
+		return environment.toString();
 	}
 }
